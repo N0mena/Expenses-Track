@@ -21,7 +21,7 @@ model User {
   username String
   email    String   @unique
   password String
-  age      Int
+  birth_date       DateTime
 }
 
 enum types{
@@ -36,7 +36,7 @@ model Expense {
   categoryId String 
   description String?
   type types
-  startDate String
-  endDate String?
+  startDate DateTime
+  endDate DateTime?
   receipt String?
 }

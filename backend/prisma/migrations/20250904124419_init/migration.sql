@@ -6,7 +6,7 @@ CREATE TABLE "User" (
     "username" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "age" INTEGER NOT NULL
+    "birth_date" DATETIME NOT NULL
 );
 
 -- CreateTable
@@ -17,8 +17,8 @@ CREATE TABLE "Expense" (
     "categoryId" TEXT NOT NULL,
     "description" TEXT,
     "type" TEXT NOT NULL,
-    "startDate" TEXT NOT NULL,
-    "endDate" TEXT,
+    "startDate" DATETIME NOT NULL,
+    "endDate" DATETIME,
     "receipt" TEXT
 );
 
