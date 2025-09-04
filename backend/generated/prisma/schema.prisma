@@ -15,13 +15,13 @@ datasource db {
 }
 
 model User {
-  id         Int    @id @default(autoincrement())
-  first_name String
-  last_name  String
-  username   String
-  email      String @unique
-  password   String
-  age        Int
+  id        Int      @id @default(autoincrement())
+  firstName String   @map("firts_name")
+  lastName  String   @map("last_name")
+  username  String
+  email     String   @unique
+  password  String
+  birthDate DateTime @map("birth_date")
 }
 
 enum types {
@@ -30,13 +30,13 @@ enum types {
 }
 
 model Expense {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   amount      Float
   date        DateTime
   categoryId  String
   description String?
   type        types
-  startDate   String
-  endDate     String?
+  startDate   DateTime  @map("start_date")
+  endDate     DateTime? @map("end_date")
   receipt     String?
 }

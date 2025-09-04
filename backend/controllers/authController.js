@@ -1,4 +1,4 @@
-import { PrismaClient } from '../generated/prisma/index.js'
+import { PrismaClient } from '../generated/prisma/index.js'; 
 import jwt from 'jsonwebtoken'
 import bcrypt from "bcryptjs"
 
@@ -10,10 +10,12 @@ const generateToken = (userId) => {
     })
 };
 
+
+
 export const register = async (req,res) => {
 
     try {
-        const { email, password, userName, firstName , lastName , birthDate } = req.body
+        const { email, password, username, firstName , lastName , birthDate } = req.body
 
         const existingUser = await prisma.user.findUnique({
             where: { email },
@@ -31,7 +33,7 @@ export const register = async (req,res) => {
             firstName,
             lastName,
             birthDate,
-            userName,
+            username,
             password: hashedPassword,
         },
     })
