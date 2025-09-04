@@ -117,22 +117,26 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
-exports.Prisma.ExpenseScalarFieldEnum = {
-  id: 'id',
-  title: 'title',
-  amount: 'amount',
-  startDate: 'startDate',
-  endDate: 'endDate'
-};
-
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
-  name: 'name',
-  userName: 'userName',
-  password: 'password',
+  first_name: 'first_name',
+  last_name: 'last_name',
+  username: 'username',
   email: 'email',
-  createdAt: 'createdAt',
-  updateAt: 'updateAt'
+  password: 'password',
+  age: 'age'
+};
+
+exports.Prisma.ExpenseScalarFieldEnum = {
+  id: 'id',
+  amount: 'amount',
+  date: 'date',
+  categoryId: 'categoryId',
+  description: 'description',
+  type: 'type',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  receipt: 'receipt'
 };
 
 exports.Prisma.SortOrder = {
@@ -140,10 +144,18 @@ exports.Prisma.SortOrder = {
   desc: 'desc'
 };
 
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
+};
+exports.types = exports.$Enums.types = {
+  one_time: 'one_time',
+  recurring: 'recurring'
+};
 
 exports.Prisma.ModelName = {
-  Expense: 'Expense',
-  User: 'User'
+  User: 'User',
+  Expense: 'Expense'
 };
 
 /**

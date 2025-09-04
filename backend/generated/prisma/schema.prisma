@@ -14,20 +14,29 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Expense {
-  id        Int      @id @default(autoincrement())
-  title     String
-  amount    Float
-  startDate DateTime @default(now()) @map("created_at")
-  endDate   DateTime @map("end_date")
+model User {
+  id         Int    @id @default(autoincrement())
+  first_name String
+  last_name  String
+  username   String
+  email      String @unique
+  password   String
+  age        Int
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  userName  String   @unique
-  password  String
-  email     String   @unique
-  createdAt DateTime @default(now()) @map("created_at")
-  updateAt  DateTime @updatedAt
+enum types {
+  one_time
+  recurring
+}
+
+model Expense {
+  id          Int      @id @default(autoincrement())
+  amount      Float
+  date        DateTime
+  categoryId  String
+  description String?
+  type        types
+  startDate   String
+  endDate     String?
+  receipt     String?
 }
