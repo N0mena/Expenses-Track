@@ -1,7 +1,7 @@
 -- CreateTable
 CREATE TABLE "User" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "first_name" TEXT NOT NULL,
+    "firts_name" TEXT NOT NULL,
     "last_name" TEXT NOT NULL,
     "username" TEXT NOT NULL,
     "email" TEXT NOT NULL,
@@ -17,8 +17,8 @@ CREATE TABLE "Expense" (
     "categoryId" TEXT NOT NULL,
     "description" TEXT,
     "type" TEXT NOT NULL,
-    "startDate" DATETIME NOT NULL,
-    "endDate" DATETIME,
+    "start_date" DATETIME NOT NULL,
+    "end_date" DATETIME,
     "receipt" TEXT
 );
 
