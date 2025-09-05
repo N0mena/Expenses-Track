@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import './App.css'
 import ExpenseForm from './components/ExpenseForm'
+import ExpenseItem from './components/ExpenseItem'
 
 
 function App() {
@@ -8,7 +9,7 @@ function App() {
 
   return (
     <>
-      <ExpenseForm/>
+      <ExpenseItem/>
     </>
   )
 }
