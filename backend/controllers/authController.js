@@ -5,49 +5,87 @@ import bcrypt from "bcryptjs"
 const prisma = new PrismaClient()
  
 const generateToken = (userId) => {
-    return jwt.sign({ id: userId }, 'defaultSecretCode' ,{
-        expiresIn: "1d"
+    return jwt.sign({ id: userId }, process.env.JWT_SECRET || 'defaultSecretCode' ,{
+        expiresIn: "7d"
     })
 };
 
+const isValidEmail = (email) =>{
+    return email && typeof email === 'string' && email.length > 10 
+    && email.toLocaleLowerCase().endsWith('@gmail.com')
+}
 
-
-export const register = async (req,res) => {
-
+export const signup = async (req,res) => {
     try {
-        const { email, password, username, firstName , lastName , birthDate } = req.body
+        const { email,userName, password} = req.body
 
-        const existingUser = await prisma.user.findUnique({
-            where: { email },
-        })
-        
-        if(existingUser) {
-            return res.status(400).json({message: "Email is already in use"})
+        if((!email || !userName) || !password){
+            return res.status(400).json({
+                message: "Email or username and password are required",
+                error: "MISSING_FIELDS"
+            })
+        }
+        if(!isValidEmail(email)){
+        return res.status(400).json({
+            message : "Only @gmail.com emails are allowed",
+            error: 'ONLY_GMAIL_ALLOWED'
+        })    
         }
 
-    const hashedPassword = await bcrypt.hash(password, 15 )
-        
-    const newUser = await prisma.user.create({
-        data: {
-            email,
-            firstName,
-            lastName,
-            birthDate,
-            username,
-            password: hashedPassword,
-        },
+        if(password.length < 6 ){
+            return res.status(400).json({
+                message: 'Password must be at least 6 characters long'
+            })
+        }
+        let user;
+
+        if (email){
+            user = await prisma.user.findUnique({
+                where: { email: email }
+            })
+        }else if (userName){
+            user = await prisma.user.findUnique({
+                where: { userName: userName }
+            })
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password)
+
+   if (!isPasswordValid) {
+    return res.status(401).json({
+        message: "Invalid credentials", 
+        error: 'INVALID_CREDENTIALS'
     })
+    }
 
-    const token = generateToken(newUser.id)
+    const hashedPassword = await bcrypt.hash(password,15)
 
-    res.status(201).json({
-        message: "User registered successfully",
-        user: { id: newUser.id, email: newUser.email, username: newUser.userName, firstName: newUser.firstName, lastName: newUser.lastName, birthDate: newUser.b},
-    token,
-})
+    const defaultUsername = email.split('@')[0] + Math.floor(Math.random() * 1000)
+    const newUser = await prisma.user.create({
+            data: {
+                email,
+                password: hashedPassword,
+                username: defaultUsername,
+                firstName: 'User',
+                lastName: 'Name',
+                birthDate
+            }
+        })
+
+        const token = generateToken(newUser.id)
+        
+        res.status(201).json({
+            message: "Utilisateur créé avec succès",
+            user: {
+                id: newUser.id,
+                email: newUser.email,
+                username: newUser.username
+            },
+            token
+        })
 
     } catch (err) {
      console.error(err)
      res.status(500).json({ message: "Server error", error: err.message })   
-    }
+    }    
 }
