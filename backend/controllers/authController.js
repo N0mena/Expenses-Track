@@ -12,7 +12,7 @@ const generateToken = (userId) => {
 
 const isValidEmail = (email) =>{
     return email && typeof email === 'string' && email.length > 10 
-    && email.toLocaleLowerCase().endsWith('@gmail.com')
+    && email.toLowerCase().endsWith('@gmail.com')
 }
 
 export const signup = async (req,res) => {
@@ -34,7 +34,8 @@ export const signup = async (req,res) => {
 
         if(password.length < 6 ){
             return res.status(400).json({
-                message: 'Password must be at least 6 characters long'
+                message: 'Password must be at least 6 characters long',
+                error: 'WEAK_PASSWORD'
             })
         }
         let user;
@@ -45,18 +46,17 @@ export const signup = async (req,res) => {
             })
         }
 
-        const isPasswordValid = await bcrypt.compare(password, user.password)
+        if (user) {
+            return res.status(400).json({
+                message: "This email is already in use",
+                error: 'EMAIL_EXISTS'
+            })
+        }
 
-   if (!isPasswordValid) {
-    return res.status(401).json({
-        message: "Invalid credentials", 
-        error: 'INVALID_CREDENTIALS'
-    })
-    }
 
     const hashedPassword = await bcrypt.hash(password,15)
-
     const defaultUsername = email.split('@')[0] + Math.floor(Math.random() * 1000)
+
     const newUser = await prisma.user.create({
             data: {
                 email,
@@ -64,14 +64,14 @@ export const signup = async (req,res) => {
                 username: defaultUsername,
                 firstName: 'User',
                 lastName: 'Name',
-                birthDate
-            }
-        })
+                birthDate: null
+            },
+        });
 
         const token = generateToken(newUser.id)
         
         res.status(201).json({
-            message: "Utilisateur créé avec succès",
+            message: "User created successfully",
             user: {
                 id: newUser.id,
                 email: newUser.email,
@@ -93,7 +93,7 @@ export const login = async (req,res) => {
 
     if((!email && !username )|| !password){
         return res.status(400).json({
-            message: "Email or username and passowrd are required",
+            message: "Email or username and password are required",
             error: "MISSING_CREDENTIALS"
         })
     }
