@@ -17,11 +17,11 @@ const isValidEmail = (email) =>{
 
 export const signup = async (req,res) => {
     try {
-        const { email,userName, password} = req.body
+        const { email,password} = req.body
 
-        if((!email || !userName) || !password){
+        if(!email || !password){
             return res.status(400).json({
-                message: "Email or username and password are required",
+                message: "Email and password are required",
                 error: "MISSING_FIELDS"
             })
         }
@@ -42,10 +42,6 @@ export const signup = async (req,res) => {
         if (email){
             user = await prisma.user.findUnique({
                 where: { email: email }
-            })
-        }else if (userName){
-            user = await prisma.user.findUnique({
-                where: { userName: userName }
             })
         }
 
@@ -88,4 +84,73 @@ export const signup = async (req,res) => {
      console.error(err)
      res.status(500).json({ message: "Server error", error: err.message })   
     }    
+}
+
+
+export const login = async (req,res) => {
+    try {
+        const { email,username ,password} = req.body
+
+    if((!email && !username )|| !password){
+        return res.status(400).json({
+            message: "Email or username and passowrd are required",
+            error: "MISSING_CREDENTIALS"
+        })
+    }
+
+    let user = null;
+
+
+    if(email){
+        if(!isValidEmail(email)){
+            return res.status(400).json({
+                   message: "Only @gmail.com emails are allowed",
+                   error: 'ONLY_GMAIL_ALLOWED'
+            })
+        }
+        user = await prisma.user.findUnique({
+        where: { email }
+    })
+    }else if(username){
+        user = await prisma.user.findUnique({
+            where: { username }
+        })
+    }
+
+
+    if(!user){
+        return res.status(401).json({
+            message: 'Invalid credentials',
+            error: "INVALID_CREDENTIALS"
+        })
+    }
+
+    const isPasswordValid = await bcrypt.compare(password,user.password)
+
+    if (!isPasswordValid) {
+        return res.status(401).json({
+            message: "Invalid credentials",
+            error: 'INVALID_CREDENTIALS'
+        })
+    }
+     
+    const token = generateToken(user.id)
+
+    res.json({
+        message: "Login successful",
+        user: {
+            id: user.id,
+            email: user.email,
+            username: user.username
+        },
+        token
+    })
+
+    } catch (error) {
+        console.error('Login error:',error)
+        res.status(500).json({
+            message:"Server error",
+            error: "SERVER_ERROR"
+        })
+    }
 }
