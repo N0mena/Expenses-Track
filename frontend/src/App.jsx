@@ -1,16 +1,21 @@
-import { useState } from 'react'
+import {BrowserRouter, Routes, Route} from "react-router-dom";
 import './App.css'
-import ExpenseForm from './components/ExpenseForm'
-import ExpenseItem from './components/ExpenseItem'
+
+import Expense from './pages/Expense'
+import Incomes from "./pages/Incomes";
+import IncomeForm from './pages/IncomeForm'
 
 
-function App() {
-  const [count, setCount] = useState(0)
-
+const App = () => {
   return (
-    <>
-      <ExpenseItem/>
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path={"/expenses"} element={<Expense/>} />
+        <Route path={"/incomes"} element={<Incomes/>} />
+        <Route path={"/newIncome"} element={<IncomeForm/>} />
+      </Routes>
+    </BrowserRouter>
+
   )
 }
 
