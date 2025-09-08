@@ -1,13 +1,13 @@
 import './App.css'
 import SignupForm from '/frontend/src/components/auth/SignupForm.jsx';
 
+function Signup() {
 
-function App() {
     return (
-    <>
-      <SignupForm/>
-    </>
-  )
+        <>
+            <SignupForm/>
+        </>
+    )
 }
 
-export default App
+export default Signup;
