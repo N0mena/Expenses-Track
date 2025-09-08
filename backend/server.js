@@ -1,15 +1,18 @@
 import express from 'express'
-import { register } from './controllers/authController.js' 
-import { createExpense } from './controllers/expenseController.js'
-import { getExpense } from './controllers/expenseController.js'
+import expenseRoutes from "./routes/expenseRoutes.js";
+import incomeRoutes from "./routes/incomeRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
+
+
 const app = express()
+const PORT = 3000;
+
 app.use(express.json())
 
-app.get('/expense', getExpense)
-app.post('/expense', createExpense)
+app.use("/api/auth", authRoutes);
+app.use("/expenses", expenseRoutes);
+app.use("/incomes", incomeRoutes);
 
-app.post('/register', register)
-
-app.listen(3000, () => {
-  console.log("Server running on http://localhost:3000")
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`)
 })
