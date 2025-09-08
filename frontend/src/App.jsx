@@ -8,6 +8,7 @@ import IncomeForm from './pages/IncomeForm'
 
 const App = () => {
   return (
+ 
     <BrowserRouter>
       <Routes>
         <Route path={"/expenses"} element={<Expense/>} />
