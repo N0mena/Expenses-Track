@@ -1,3 +1,4 @@
+
 import express from "express";
 import { signup, login, getMe } from "../controllers/authController";
 import { authenticateToken } from "../middleware/auth";
@@ -11,3 +12,4 @@ router.post("/login", login);
 router.get("/me", getMe, authenticateToken);
 
 export default router;
+

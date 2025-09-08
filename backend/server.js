@@ -1,3 +1,4 @@
+
 import express from "express";
 import expenseRoutes from "./routes/expenseRoutes.js";
 import incomeRoutes from "./routes/incomeRoutes.js";
@@ -15,3 +16,4 @@ app.use("/incomes", incomeRoutes);
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
+
