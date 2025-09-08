@@ -1,8 +1,10 @@
 import {BrowserRouter, Routes, Route} from "react-router-dom";
 import './App.css'
+
 import Expense from './pages/Expense'
 import Incomes from "./pages/Incomes";
 import IncomeForm from './pages/IncomeForm'
+
 
 const App = () => {
   return (
@@ -13,6 +15,7 @@ const App = () => {
         <Route path={"/newIncome"} element={<IncomeForm/>} />
       </Routes>
     </BrowserRouter>
+
   )
 }
 
