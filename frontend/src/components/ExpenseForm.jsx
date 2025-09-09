@@ -3,6 +3,9 @@ import "tailwindcss";
 
 function ExpenseForm() {
   const [recurring, setRecurring] = useState(false);
+  const [ saved, setSaved ] = useState(false);
+  const [ cancelled, setCancelled ] = useState(false)
+
 
   return (
     <>
@@ -16,7 +19,7 @@ function ExpenseForm() {
             <p> Type : </p>
             <div className="flex w-full place-content-center gap-3 m-1">
               <button
-                type="button"
+                type="button" 
                 className=" box-border px-4 py-1 border-gray-300 shadow-sm hover:border-2 hover:py-0.5 hover:px-3.5 focus:bg-gray-300 bg-white rounded-sm "
                 onClick={() => setRecurring(false)}
               >
@@ -35,7 +38,7 @@ function ExpenseForm() {
           </div>
           <hr />
           <div className=" w-full place-content-end m-1">
-            <p>Creation Date</p>
+            <p>Creation Date </p>
           </div>
           <div>
             <div className=" w-full place-content-between m-1">
