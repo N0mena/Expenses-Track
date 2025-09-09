@@ -63,5 +63,22 @@ export const getExpenseById = async (req,res) => {
 res.status(500).json({ message: "Server error", error: error.message });
 
     }
-    
+}
+
+export const deleteExpense = async (req,res) => {
+    try {
+        const { id } = req.params;
+        const { userId } = req.user.id;
+        
+        const deleted = await prisma.expense.deleteMany({
+            where: { id, userId },
+        })
+
+        if(deleted.count === 0 ){
+            return res.status(404).json({message:"Expense not found"})
+        }
+        
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
 }
