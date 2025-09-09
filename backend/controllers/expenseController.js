@@ -77,13 +77,15 @@ export const deleteExpense = async (req,res) => {
         if(deleted.count === 0 ){
             return res.status(404).json({message:"Expense not found"})
         }
+    
+        res.status(204).send();
         
     } catch (error) {
         res.status(500).json({ message: "Server error", error: error.message });
     }
 }
 
-export const updateExpense = async (params) => {
+export const updateExpense = async (req,res) => {
     try {
        const { id } = req.params;
        const { userId } = req.user.id;
@@ -107,6 +109,8 @@ export const updateExpense = async (params) => {
     if (updated.count === 0) {
       return res.status(404).json({ message: "Expense not found" });
     }
+    const expense = await prisma.expense.findUnique({ where: { id } });
+    res.json(expense);
     } catch (error) {
         res.status(500).json({ message: "Server error", error: error.message });
     }
