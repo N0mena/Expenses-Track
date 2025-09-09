@@ -7,10 +7,10 @@ expenseRoutes.get("/", getExpense);
 
 expenseRoutes.post("/", createExpense);
 
-expenseRoutes.get("/",getExpenseById);
+expenseRoutes.get("/:id",getExpenseById);
 
-expenseRoutes.delete("/",deleteExpense);
+expenseRoutes.delete("/:id",deleteExpense);
 
-expenseRoutes.update("",updateExpense);
+expenseRoutes.update("/:id",updateExpense);
 
 export default expenseRoutes;
