@@ -82,3 +82,32 @@ export const deleteExpense = async (req,res) => {
         res.status(500).json({ message: "Server error", error: error.message });
     }
 }
+
+export const updateExpense = async (params) => {
+    try {
+       const { id } = req.params;
+       const { userId } = req.user.id;
+        const {  amount,date,categoryId,description,type,startDate,endDate,title,} = req.body;
+       
+    const updated = await prisma.expense.updateMany({
+      where: { id, userId },
+      data: {
+        title,
+        amount: amount ? parseFloat(amount) : undefined,
+        date: date ? new Date(date) : undefined,
+        categoryId,
+        description,
+        type: type ? (type === "recurring" ? "recurring" : "one_time") : undefined,
+        startDate: startDate ? new Date(startDate) : undefined,
+        endDate: endDate ? new Date(endDate) : undefined,
+        receipt: req.file ? req.file.path : undefined,
+      },
+    });
+
+    if (updated.count === 0) {
+      return res.status(404).json({ message: "Expense not found" });
+    }
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+}
