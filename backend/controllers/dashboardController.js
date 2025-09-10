@@ -198,3 +198,101 @@ export const getExpensesByCategory = async (req,res) => {
         });
     }
 }
+export const getMonthlyTrend = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const currentDate = new Date();
+        const year = parseInt(req.query.year) || currentDate.getFullYear();
+        const monthsCount = parseInt(req.query.months) || 6;
+        const monthlyData = [];
+        
+        for (let i = monthsCount - 1; i >= 0; i--) {
+            const targetDate = new Date(year, currentDate.getMonth() - i, 1);
+            const targetYear = targetDate.getFullYear();
+            const targetMonth = targetDate.getMonth() + 1;
+            
+            const { firstDay, lastDay } = getMonthDate(targetYear, targetMonth);
+            
+
+            const incomeResult = await prisma.income.aggregate({
+                where: {
+                    userId: userId,
+                    date: {
+                        gte: firstDay,
+                        lte: lastDay
+                    }
+                },
+                _sum: {
+                    amount: true
+                }
+            });
+
+            const oneTimeExpenseResult = await prisma.expense.aggregate({
+                where: {
+                    userId: userId,
+                    type: 'one_time',
+                    date: {
+                        gte: firstDay,
+                        lte: lastDay
+                    }
+                },
+                _sum: {
+                    amount: true
+                }
+            });
+
+            const recurringExpenses = await prisma.expense.findMany({
+                where: {
+                    userId: userId,
+                    type: 'recurring',
+                    startDate: {
+                        lte: lastDay
+                    },
+                    OR: [
+                        { endDate: null },
+                        { endDate: { gte: firstDay } }
+                    ]
+                }
+            });
+            
+            const totalIncome = incomeResult._sum.amount || 0;
+            const totalOneTimeExpenses = oneTimeExpenseResult._sum.amount || 0;
+            const totalRecurringExpenses = recurringExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+            const totalExpenses = totalOneTimeExpenses + totalRecurringExpenses;
+            const balance = totalIncome - totalExpenses;
+            
+            monthlyData.push({
+                year: targetYear,
+                month: targetMonth,
+                monthName: targetDate.toLocaleString('en-US', { month: 'long' }),
+                period: `${targetMonth}/${targetYear}`,
+                totalIncome,
+                totalExpenses,
+                balance,
+                isPositive: balance >= 0
+            });
+        }
+        
+        res.json({
+            success: true,
+            message: "Monthly trend retrieved successfully",
+            data: {
+                months: monthlyData,
+                period: `${monthsCount} months trend`,
+                summary: {
+                    avgIncome: monthlyData.reduce((sum, month) => sum + month.totalIncome, 0) / monthlyData.length,
+                    avgExpenses: monthlyData.reduce((sum, month) => sum + month.totalExpenses, 0) / monthlyData.length,
+                    avgBalance: monthlyData.reduce((sum, month) => sum + month.balance, 0) / monthlyData.length
+                }
+            }
+        });
+        
+    } catch (error) {
+        console.error('Monthly trend error:', error);
+        res.status(500).json({
+            success: false,
+            message: "Server error",
+            error: error.message
+        });
+    }
+};
