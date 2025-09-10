@@ -81,3 +81,71 @@ export const getAllCategories = async (req, res) => {
         });
     }
 }
+
+export const createCategory = async (req,res) => {
+    try {
+        const userId = req.user.id;
+        const { name } = req.body;
+
+         const trimmedName = name.trim();
+
+        if (!name || name.trim().length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Category name is required",
+                error: "MISSING_CATEGORY_NAME"
+            });
+        }
+
+        const existingCategory = await prisma.category.findFirst({
+            where: {
+                userId,
+                name: {
+                    equals: trimmedName,
+                    mode: 'insensitive'
+                }
+            }
+        });
+
+        if(existingCategory){
+            return res.status(400).json({
+                success: false,
+                message: "A category with this name already exists",
+                error: "CATEGORY_ALREADY_EXISTS"
+            });
+        }
+
+        const newCategory = await prisma.category.create({
+            date: {
+                name: trimmedName,
+                userId,
+                updateAt: new Date()
+            }
+        });
+
+        const categoriesWithInfo = {
+            id: newCategory.id,
+            name: newCategory.name,
+            userId: newCategory.userId,
+            createdAt: newCategory.createdAt,
+            updatedAt: newCategory.updateAt,
+            expenseCount: 0,
+            isDefault: false,
+            canDelete: true
+        };
+
+        res.status(201).json({
+            success: true,
+            message: "Category created successfully",
+            data: categoriesWithInfo
+        })
+
+    } catch (error) {
+        console.error("Create category error",error);
+        res.status(500).json({
+            success: false,
+            message: "Server error",
+            error: error.message
+        });
+    }
+};
