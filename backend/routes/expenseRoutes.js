@@ -14,3 +14,4 @@ expenseRoutes.delete("/:id",deleteExpense);
 expenseRoutes.update("/:id",updateExpense);
 
 export default expenseRoutes;
+
