@@ -149,3 +149,51 @@ export const createCategory = async (req,res) => {
         });
     }
 };
+
+
+export const getCategoryById = async (req,res) {
+    try {
+        const userId = req.user.id;
+        const { id } = req.params;
+
+        const category = await prisma.category.findFirst({
+            where: {
+                id,
+                userId
+            },
+            include: {
+                expense: {
+                    orderBy: { createdAt: 'desc'},
+                    take: 5
+                },
+                _count: {
+                    select: { expense: true }
+                }
+            }
+        });
+
+        if( !category ){
+            return res.status(404).json({ succes: false, message: "Category not found", error: "CATEGORY_NOT_FOUND"});
+        }
+        
+        const categoriesWithInfo = {
+            id: category.id,
+            name: category.name,
+            createdAt: category.createdAt,
+            updateAt: category.updateAt,
+            expenseCount: category._count.expense,
+            isDefault: DEFAULT_CATEGORIES.includes(category.name),
+            canDelete: category._count.expense === 0,
+            recentExpense: category.expense
+        }
+
+        res.json({
+            message: "Category retrieved succesfully",
+            data: categoriesWithInfo
+        })
+
+    } catch (error) {
+        console.error(`Get category by ID error:`, error);
+        res.status(500).json({message:"Server error",error: error.message});
+    }
+};
