@@ -1,4 +1,5 @@
 import { useState } from "react";
+import 'tailwindcss'
 import { useNavigate } from "react-router-dom";
 
 const NewIncome = () => {
@@ -19,7 +20,7 @@ const NewIncome = () => {
   };
 
   return (
-    <div className="p-6 max-w-md w-full my-5 bg-white rounded-2xl shadow text-black">
+    <div className="p-6 max-w-md w-full my-5 bg-green-50 rounded-2xl shadow text-black">
       <h1 className="text-xl font-bold mb-4">Add New Income</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input

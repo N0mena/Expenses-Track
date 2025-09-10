@@ -19,7 +19,7 @@ const COLORS = [
 
 const CategoryChart = ({ data = [] }) => {
   return (
-    <div className="w-full h-70 my-5 bg-white rounded-2xl shadow p-4">
+    <div className="w-full h-70 my-5 bg-green-50 rounded-2xl shadow p-4">
       <h2 className="text-lg font-semibold text-gray-700 mb-4">
         Expenses by Category
       </h2>

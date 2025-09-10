@@ -13,7 +13,7 @@ const ExpenseTrendChart = ({ data = [] }) => {
 
 
   return (
-    <div className="w-full h-80 bg-white rounded-2xl shadow p-4">
+    <div className="w-full h-80 bg-gray-50 rounded-2xl shadow p-4">
       <h2 className="text-lg font-semibold text-gray-700 mb-4">
         Expense Trend
       </h2>

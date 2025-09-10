@@ -1,10 +1,10 @@
-  import 'tailwindcss'
+import 'tailwindcss'
 
 const BudgetProgress = ({ spent = 0, budget = 0 }) => {
   const percentage = budget > 0 ? Math.min((spent / budget) * 100, 100) : 0;
 
   return (
-    <div className="w-full my-5 bg-white rounded-2xl shadow p-4">
+    <div className="w-full my-5 bg-red-50 rounded-2xl shadow p-4">
       <h2 className="text-lg font-semibold text-gray-700 mb-2">Budget Usage</h2>
 
       <div className="flex justify-between text-sm text-gray-600 mb-1">

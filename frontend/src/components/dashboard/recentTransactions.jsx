@@ -1,6 +1,7 @@
+
 const RecentTransactions = ({ transactions = [] }) => {
   return (
-    <div className="w-full bg-white rounded-2xl shadow p-4">
+    <div className="w-full bg-blue-50 rounded-2xl shadow p-4">
       <h2 className="text-lg font-semibold text-gray-700 mb-4">
         Recent Transactions
       </h2>
