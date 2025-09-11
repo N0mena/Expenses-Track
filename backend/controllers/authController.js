@@ -157,7 +157,7 @@ export const login = async (req,res) => {
 
 export const getMe = async (req,res) => {
     try {
-        const userId = req.user.id
+        const userId = req.user.id;
 
         const user = await prisma.user.findUnique({
             where: { id : userId},
@@ -174,21 +174,19 @@ export const getMe = async (req,res) => {
             return res.status(404).json({
                 message: "User not found",
                 error: 'USER_NOT_FOUND'
-            })
+            });
         }
+
         res.json({
             message: "Profile retrieved successfully",
             user
-        })
-
-
+        });
 
     } catch (error) {
         console.error("",error)
         res.status(500).json({
             message: "Server error",
             error: "SERVER_ERROR"
-        })        
-    }
-    
+        });        
+    } 
 }
