@@ -9,26 +9,21 @@ export const createExpense = async (req,res) => {
         if( !amount ){
             return res.status(400).json({message: "amount are required"})
         }
-        const expense = await prisma.expense.create({
+     const expense = await prisma.expense.create({
             data:{
-            type: type ==='reccuring'? 'recurring': 'one_time',
+            type: type ==='recurring'? 'recurring': 'one_time',
             amount: parseFloat(amount),
             date:  new Date(date),
             categoryId,
             description,
-            startDate: startDate ? new startDate(startDate): null,
-            endDate: endDate ? new endDate(endDate): null,
+            startDate: startDate ? new Date(startDate): null,
+            endDate: endDate ? new Date(endDate): null,
             receipt,
-                user: {
-      connect: {
-        id: req.user.id
-      }
-    }
+            userId: req.user.id
   }
 });
 
-        const savedExpense = await expense.save();
-        res.status(201).json(savedExpense);
+        res.status(201).json(expense);
 
     } catch (error) {
         res.status(500).json({message:"Error servor", error: error.message});      
@@ -57,7 +52,7 @@ export const getExpenseById = async (req,res) => {
         const { id } = req.params;
         const userId = req.user.id;
         const expense = await prisma.expense.findFirst({
-            where: { id, userId},
+           where: { id: parseInt(id), userId},
         });
 
         if(!expense){
@@ -77,7 +72,7 @@ export const deleteExpense = async (req,res) => {
         const { userId } = req.user.id;
         
         const deleted = await prisma.expense.deleteMany({
-            where: { id, userId },
+           where: { id: parseInt(id), userId}
         })
 
         if(deleted.count === 0 ){
@@ -98,7 +93,7 @@ export const updateExpense = async (req,res) => {
         const {  amount,date,categoryId,description,type,startDate,endDate} = req.body;
        
     const updated = await prisma.expense.updateMany({
-      where: { id, userId },
+     where: { id: parseInt(id), userId},
       data: {
         amount: amount ? parseFloat(amount) : undefined,
         date: date ? new Date(date) : undefined,
