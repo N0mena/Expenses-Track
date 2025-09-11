@@ -15,4 +15,4 @@ router.put("/",updateCategoryId)
 
 router.delete("/",deleteCategoryId)
 
-export default router;
+export default categoryRoutes;
