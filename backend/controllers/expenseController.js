@@ -4,13 +4,13 @@ const prisma = new PrismaClient();
 
 export const createExpense = async (req,res) => {
     try {
-        const { title, amount,type, date ,categoryId , description , startDate, endDate, receipt } = req.body;
+        const { amount,type, date ,categoryId , description , startDate, endDate, receipt } = req.body;
 
-        if( !title || !amount ){
-            return res.status(400).json({message: "title and amount are required"})
+        if( !amount ){
+            return res.status(400).json({message: "amount are required"})
         }
         const expense = await prisma.expense.create({
-            title,
+            data:{
             type: type ==='reccuring'? 'recurring': 'one_time',
             amount: parseFloat(amount),
             date:  new Date(date),
@@ -19,7 +19,13 @@ export const createExpense = async (req,res) => {
             startDate: startDate ? new startDate(startDate): null,
             endDate: endDate ? new endDate(endDate): null,
             receipt,
-        })
+                user: {
+      connect: {
+        id: req.user.id
+      }
+    }
+  }
+});
 
         const savedExpense = await expense.save();
         res.status(201).json(savedExpense);
@@ -89,12 +95,11 @@ export const updateExpense = async (req,res) => {
     try {
        const { id } = req.params;
        const { userId } = req.user.id;
-        const {  amount,date,categoryId,description,type,startDate,endDate,title,} = req.body;
+        const {  amount,date,categoryId,description,type,startDate,endDate} = req.body;
        
     const updated = await prisma.expense.updateMany({
       where: { id, userId },
       data: {
-        title,
         amount: amount ? parseFloat(amount) : undefined,
         date: date ? new Date(date) : undefined,
         categoryId,

@@ -5,9 +5,11 @@ import bcrypt from "bcryptjs"
 const prisma = new PrismaClient()
  
 const generateToken = (userId) => {
-    return jwt.sign({ id: userId }, process.env.JWT_SECRET || 'defaultSecretCode' ,{
-        expiresIn: "7d"
-    })
+    return jwt.sign(
+      { id: userId },
+      process.env.JWT_SECRET || 'defaultSecretCode',
+      { expiresIn: "7d" }
+    );
 };
 
 const isValidEmail = (email) =>{
