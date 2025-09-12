@@ -86,25 +86,25 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-slate-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-slate-200 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
           <div className="flex justify-center">
             <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center">
-                <DollarSign className="h-7 w-7 text-white" />
+              <div className="w-12 h-12 bg-[#031163] rounded-3xl flex items-center justify-center">
+                <DollarSign className="h-6 w-6 text-white" />
               </div>
-              <h1 className="text-3xl font-light text-slate-900">Expencio</h1>
+              <h1 className="text-4xl font-light text-slate-900">Expencio</h1>
             </div>
           </div>
-          <h2 className="mt-8 text-center text-3xl font-light text-slate-900">
+          <h2 className="mt-4 text-center text-5xl font-light text-[#1fbfb8]">
             Create your account
           </h2>
-          <p className="mt-3 text-center text-sm text-slate-600">
+          <p className="mt-4 text-center text-m text-slate-600">
             Already have an account?{" "}
             <Link
               to="/login"
-              className="font-medium text-slate-900 hover:text-slate-700 transition-colors"
+              className="font-medium text-[#1978a5] hover:text-slate-700 transition-colors"
             >
               Sign in
             </Link>
@@ -122,7 +122,7 @@ const Signup = () => {
             <div className="space-y-2">
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-slate-700"
+                className="block text-sm font-medium text-[#05716c]"
               >
                 Email address
               </label>
@@ -149,7 +149,7 @@ const Signup = () => {
             <div className="space-y-2">
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-slate-700"
+                className="block text-sm font-medium text-[#05716c]"
               >
                 Password
               </label>
@@ -191,7 +191,7 @@ const Signup = () => {
             <div className="space-y-2">
               <label
                 htmlFor="confirmPassword"
-                className="block text-sm font-medium text-slate-700"
+                className="block text-sm font-medium text-[#05716c]"
               >
                 Confirm Password
               </label>
@@ -234,7 +234,7 @@ const Signup = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full flex justify-center py-3 px-4 text-sm font-medium rounded-2xl text-white bg-slate-900 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md"
+                className="w-full flex justify-center py-3 px-4 text-sm font-medium rounded-2xl text-white bg-[#1fbfb8] hover:bg-[#031163] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md"
               >
                 {isSubmitting ? (
                   <div className="flex items-center">
@@ -254,5 +254,3 @@ const Signup = () => {
 };
 
 export default Signup;
-
-
