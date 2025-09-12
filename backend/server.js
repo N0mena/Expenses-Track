@@ -17,6 +17,24 @@ app.use("/incomes", incomeRoutes);
 app.use("/categories",categoryRoutes);
 app.use("/dashboard",dashboardRoutes);
 
+app.use(cors({
+  origin: process.env.FRONTEND_URL || "http://localhost:5173",
+  credentials: true
+}));
+app.use(express.json());
+
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ 
+    message: "Something went wrong!", 
+    error: process.env.NODE_ENV === 'production' ? {} : err.message 
+  });
+});
+
+app.use("*", (req, res) => {
+  res.status(404).json({ message: "Route not found" });
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
