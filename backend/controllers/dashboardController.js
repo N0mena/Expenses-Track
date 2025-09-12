@@ -26,7 +26,7 @@ export const getDashboard = async (req,res) =>{
         console.log(`Dashboard for ${month}/${year}`);
         console.log(`${firstDay} -> ${lastDay}`)
 
-        const incomeResult = await prisma.income.aggrergate({
+        const incomeResult = await prisma.income.aggregate({
             where: {
                 userId: userId,
                 date: {
@@ -41,7 +41,7 @@ export const getDashboard = async (req,res) =>{
 
         const totalIncome = incomeResult._sum.amount || 0;
 
-        const oneTimeExpenseResult = await prisma.expense.aggrergate({
+        const oneTimeExpenseResult = await prisma.expense.aggregate({
             where: {
                 userId: userId,
                 type: 'one_time',
@@ -55,7 +55,7 @@ export const getDashboard = async (req,res) =>{
             }
         });
 
-          const reccuringExpenses = await prisma.expense.aggrergate({
+          const reccuringExpenses = await prisma.expense.aggregate({
             where: {
                 userId: userId,
                 type: 'recurring',

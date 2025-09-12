@@ -4,7 +4,7 @@ import { authenticateToken } from "../middleware/auth.js";
 
 const incomeRoutes = Router();
 
-incomeRoutes.use(authenticateToken)
+incomeRoutes.use(authenticateToken);
 
 incomeRoutes.get("/", getAllIncomes);
 

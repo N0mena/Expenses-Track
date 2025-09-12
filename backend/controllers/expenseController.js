@@ -1,7 +1,6 @@
 import { PrismaClient } from "../generated/prisma/index.js";
 
 const prisma = new PrismaClient();
-
 export const createExpense = async (req,res) => {
     try {
         const { amount,type, date ,categoryId , description , startDate, endDate, receipt } = req.body;
@@ -9,27 +8,40 @@ export const createExpense = async (req,res) => {
         if( !amount ){
             return res.status(400).json({message: "amount are required"})
         }
-     const expense = await prisma.expense.create({
+
+        if( !categoryId ){
+            return res.status(400).json({message: "categoryId is required"})
+        }
+
+         const expense = await prisma.expense.create({
             data:{
-            type: type ==='recurring'? 'recurring': 'one_time',
-            amount: parseFloat(amount),
-            date:  new Date(date),
-            categoryId,
-            description,
-            startDate: startDate ? new Date(startDate): null,
-            endDate: endDate ? new Date(endDate): null,
-            receipt,
-            userId: req.user.id
-  }
-});
+                type: type ==='recurring'? 'recurring': 'one_time',
+                amount: parseFloat(amount),
+                date:  new Date(date),
+                description: description || null,
+                startDate: startDate ? new Date(startDate) : new Date(date),
+                endDate: endDate ? new Date(endDate): null,
+                receipt: receipt || null,
+                user: {
+                    connect: {
+                        id: req.user.id
+                    }
+                },
+                category: {
+                    connect: {
+                        id: categoryId
+                    }
+                }
+            }
+        });
 
         res.status(201).json(expense);
 
     } catch (error) {
-        res.status(500).json({message:"Error servor", error: error.message});      
+        console.error('Create expense error:', error);
+        res.status(500).json({message:"Error server", error: error.message});      
     }
 };
-
 export const getExpense = async (req,res) => {
     try {
         const { start,end,category,type} = req.query;

@@ -42,7 +42,7 @@ model Expense {
   categoryId String @map("category_id")
   description String?
   type types
-  startDate DateTime @map("start_date")
+  startDate DateTime? @map("start_date")
   endDate DateTime? @map("end_date")
   receipt String?
   userId Int @map("user_id")
