@@ -58,7 +58,7 @@ export const getAllCategories = async (req, res) => {
             name: category.name,
             userId: category.userId,
             createdAt: category.createdAt,
-            updatedAt: category.updateAt,
+            updatedAt: category.updatedAt,
             expenseCount: category._count.expenses,
             isDefault: DEFAULT_CATEGORIES.includes(category.name),
             canDelete: category._count.expenses === 0
@@ -100,10 +100,7 @@ export const createCategory = async (req,res) => {
         const existingCategory = await prisma.category.findFirst({
             where: {
                 userId,
-                name: {
-                    equals: trimmedName,
-                    mode: 'insensitive'
-                }
+                name: trimmedName
             }
         });
 
@@ -116,7 +113,7 @@ export const createCategory = async (req,res) => {
         }
 
         const newCategory = await prisma.category.create({
-            date: {
+            data: { 
                 name: trimmedName,
                 userId,
                 updatedAt: new Date()
@@ -167,13 +164,13 @@ export const getCategoryById = async (req,res) => {
                     take: 5
                 },
                 _count: {
-                    select: { expense: true }
+                    select: { expenses: true } 
                 }
             }
         });
 
         if( !category ){
-            return res.status(404).json({ succes: false, message: "Category not found", error: "CATEGORY_NOT_FOUND"});
+            return res.status(404).json({ success: false, message: "Category not found", error: "CATEGORY_NOT_FOUND"}); 
         }
         
         const categoriesWithInfo = {
@@ -184,17 +181,18 @@ export const getCategoryById = async (req,res) => {
             expenseCount: category._count.expenses,
             isDefault: DEFAULT_CATEGORIES.includes(category.name),
             canDelete: category._count.expenses === 0,
-            recentExpense: category.expenses
+            recentExpenses: category.expenses
         }
 
         res.json({
-            message: "Category retrieved succesfully",
+            success: true,
+            message: "Category retrieved successfully",
             data: categoriesWithInfo
         })
 
     } catch (error) {
         console.error(`Get category by ID error:`, error);
-        res.status(500).json({message:"Server error",error: error.message});
+        res.status(500).json({success: false, message:"Server error",error: error.message});
     }
 }
 
@@ -204,8 +202,9 @@ export const updateCategoryId = async (req,res) => {
         const { id } = req.params;
         const { name } = req.body;
 
-        if( !name || name.trim().length ===0 ){
+        if( !name || name.trim().length === 0 ){
             return res.status(400).json({
+                success: false,
                 message: "Category name is required",
                 error: "MISSING_CATEGORY_NAME"
             })
@@ -219,16 +218,13 @@ export const updateCategoryId = async (req,res) => {
         });
 
         if(!existingCategory){
-            return res.status(404).json({message: 'Category not found',error: "CATEGORY_NOT_FOUND"});
+            return res.status(404).json({success: false, message: 'Category not found',error: "CATEGORY_NOT_FOUND"});
         }
 
         const duplicateCategory = await prisma.category.findFirst({
-            wher: {
+            where: {
                 userId,
-                name: {
-                    equals: trimmedName,
-                    mode: 'intensitive'
-                },
+                name: trimmedName,
                 id: {
                     not: id
                 }
@@ -237,6 +233,7 @@ export const updateCategoryId = async (req,res) => {
 
         if (duplicateCategory) {
             return res.status(400).json({
+                success: false,
                 message: "A category with this name already exists",
                 error: "CATEGORY_ALREADY_EXISTS"
             });
@@ -247,7 +244,7 @@ export const updateCategoryId = async (req,res) => {
             where: { id },
             data: {
                 name: trimmedName,
-                updateAt: new Date()
+                updatedAt: new Date() 
             },
             include: {
                 _count: {
@@ -261,13 +258,14 @@ export const updateCategoryId = async (req,res) => {
             name: updatedCategory.name,
             userId: updatedCategory.userId,
             createdAt: updatedCategory.createdAt,
-            updatedAt: updatedCategory.updateAt,
+            updatedAt: updatedCategory.updatedAt,
             expenseCount: updatedCategory._count.expenses,
             isDefault: DEFAULT_CATEGORIES.includes(updatedCategory.name),
             canDelete: updatedCategory._count.expenses === 0
         };
 
         res.json({
+            success: true,
             message: "Category updated successfully",
             data: categoryWithInfo
         });
@@ -276,7 +274,7 @@ export const updateCategoryId = async (req,res) => {
 
     } catch (error) {
         console.error(`Update category error:`, error);
-        res.status(500).json({message:"Server error",error: error.message});  
+        res.status(500).json({success: false, message:"Server error",error: error.message});  
     }
 }
 
@@ -295,19 +293,29 @@ export const deleteCategoryId = async (req,res) => {
         })
 
         if( !category){
-            return res.status(404).json({message:"Category not found",error:"CATEGORY_NOT_FOUND"});
+            return res.status(404).json({success: false, message:"Category not found",error:"CATEGORY_NOT_FOUND"});
         }
 
-        if ( category._count.expense > 0){
+        if ( category._count.expenses > 0){ 
             return res.status(400).json({
-                message: `Cannot delete category. It is used by ${category._count.expenses}`
+                success: false, 
+                message: `Cannot delete category. It is used by ${category._count.expenses} expenses`,
+                error: "CATEGORY_IN_USE" 
             })
         }
 
+        await prisma.category.delete({
+            where: { id }
+        });
+
+        res.json({
+            success: true,
+            message: "Category deleted successfully"
+        });
+
     } catch (error) {
                 console.error(`Delete category error:`, error);
-        res.status(500).json({message:"Server error",error: error.message});  
+        res.status(500).json({success: false, message:"Server error",error: error.message});  
     }
     
 }
-   

@@ -3,6 +3,6 @@ node_modules
 .env
 
 /generated/prisma
-
+**/generated/prisma
 dev.deb
-
+*dev.deb

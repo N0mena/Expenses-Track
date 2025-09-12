@@ -21,7 +21,7 @@ model User {
   username String
   email    String   @unique
   password String 
-  birthDate       DateTime @map("birth_date")
+  birthDate       DateTime? @map("birth_date")
   
   categories Category[]
   incomes Income[]
@@ -42,7 +42,7 @@ model Expense {
   categoryId String @map("category_id")
   description String?
   type types
-  startDate DateTime @map("start_date")
+  startDate DateTime? @map("start_date")
   endDate DateTime? @map("end_date")
   receipt String?
   userId Int @map("user_id")
@@ -58,7 +58,7 @@ model Category {
   name String
   userId Int @map("user_id")
   createdAt DateTime @default(now()) @map("created_at")
-  updateAt DateTime @map("updated_at")
+  updatedAt DateTime @map("updated_at")
    
   user User @relation(fields: [userId], references: [id],onDelete: Cascade)
 
@@ -76,7 +76,7 @@ model Income {
   description String?
   userId Int @map("user_id")
   createdAt DateTime @default(now()) @map("created_at")
-  updateAt DateTime @updatedAt @map("update_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
 
   user User @relation(fields: [userId],references: [id], onDelete: Cascade)
