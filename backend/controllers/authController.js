@@ -1,6 +1,7 @@
 import { PrismaClient } from '../generated/prisma/index.js'; 
 import jwt from 'jsonwebtoken'
 import bcrypt from "bcryptjs"
+import { createDefaultCategories } from './categoryController.js';
 
 const prisma = new PrismaClient()
  
@@ -67,6 +68,12 @@ export const signup = async (req,res) => {
                 birthDate: null
             },
         });
+
+           try {
+            await createDefaultCategories(newUser.id);
+        } catch (categoryError) {
+            console.error('Error creating default categories:', categoryError);
+        }
 
         const token = generateToken(newUser.id)
         
