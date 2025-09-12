@@ -1,115 +1,88 @@
-import { PrismaClient } from '../generated/prisma/index.js'; 
+import { PrismaClient } from '../generated/prisma/index.js';
 
 const prisma = new PrismaClient();
 
-
-const getMonthDate = (year,month) => {
-    const firstDay = new Date(year,month - 1,1);
-    const lastDay = new Date(year, month , 0);
-    lastDay.setHours(23,59,59);
-
-    return { firstDay,lastDay };
-
+const getDateRange = (year, month) => {
+    const firstDay = new Date(year, month - 1, 1);
+    const lastDay = new Date(year, month, 0);
+    lastDay.setHours(23, 59, 59, 999);
+    return { firstDay, lastDay };
 };
 
+const calculateTotals = async (userId, startDate, endDate) => {
+    const incomeResult = await prisma.income.aggregate({
+        where: {
+            userId: userId,
+            date: {
+                gte: startDate,
+                lte: endDate
+            }
+        },
+        _sum: { amount: true }
+    });
 
-export const getDashboard = async (req,res) =>{
+    const oneTimeExpenseResult = await prisma.expense.aggregate({
+        where: {
+            userId: userId,
+            type: 'one_time',
+            date: {
+                gte: startDate,
+                lte: endDate
+            }
+        },
+        _sum: { amount: true }
+    });
+
+    const recurringExpenses = await prisma.expense.findMany({
+        where: {
+            userId: userId,
+            type: 'recurring',
+            startDate: { lte: endDate },
+            OR: [
+                { endDate: null },
+                { endDate: { gte: startDate } }
+            ]
+        },
+        select: { amount: true }
+    });
+
+    const totalIncome = incomeResult._sum.amount || 0;
+    const totalOneTimeExpenses = oneTimeExpenseResult._sum.amount || 0;
+    const totalRecurringExpenses = recurringExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+    const totalExpenses = totalOneTimeExpenses + totalRecurringExpenses;
+    const balance = totalIncome - totalExpenses;
+
+    return {
+        totalIncome,
+        totalExpenses,
+        oneTimeExpenses: totalOneTimeExpenses,
+        recurringExpenses: totalRecurringExpenses,
+        balance,
+        isPositive: balance >= 0,
+        isOverBudget: totalExpenses > totalIncome,
+        overBudgetAmount: totalExpenses > totalIncome ? totalExpenses - totalIncome : 0
+    };
+};
+
+export const getMonthlySummary = async (req, res) => {
     try {
         const userId = req.user.id;
-
         const currentDate = new Date();
-        const year = parseInt(req.query.year) || currentDate.getFullYear();
-        const month = parseInt(req.query.month) || (currentDate.getMonth() + 1);
 
-        const { firstDay, lastDay} = getMonthDate(year,month);
+        let year, month;
+        if (req.query.month) {
+            const [yearStr, monthStr] = req.query.month.split('-');
+            year = parseInt(yearStr);
+            month = parseInt(monthStr);
+        } else {
+            year = currentDate.getFullYear();
+            month = currentDate.getMonth() + 1;
+        }
 
-        console.log(`Dashboard for ${month}/${year}`);
-        console.log(`${firstDay} -> ${lastDay}`)
+        const { firstDay, lastDay } = getDateRange(year, month);
+        const totals = await calculateTotals(userId, firstDay, lastDay);
 
-        const incomeResult = await prisma.income.aggregate({
-            where: {
-                userId: userId,
-                date: {
-                    gte: firstDay,
-                    lte: lastDay
-                }
-            },
-            _sum: {
-                amount: true
-            }
-        });
-
-        const totalIncome = incomeResult._sum.amount || 0;
-
-        const oneTimeExpenseResult = await prisma.expense.aggregate({
-            where: {
-                userId: userId,
-                type: 'one_time',
-                date:{
-                    gte: firstDay,
-                    lte: lastDay
-                }
-            },
-            _sum: {
-                amount: true
-            }
-        });
-
-          const reccuringExpenses = await prisma.expense.aggregate({
-            where: {
-                userId: userId,
-                type: 'recurring',
-                startDate:{
-                    lte: lastDay
-                },
-            OR:[
-                 { endDate: null},
-                 { endDate: { gte: firstDay} }
-            ] 
-            }
-        });
-
-
-          let totalRecurringExpenses = 0;
-          reccuringExpenses.forEach(expense => {
-              totalRecurringExpenses += expense.amount; 
-          });
-       
-           const totalOneTimeExpenses = oneTimeExpenseResult._sum.amount || 0;
-        const totalExpenses = totalOneTimeExpenses + totalRecurringExpenses;
-        const balance = totalIncome - totalExpenses;
-
-        res.json({
-            succes: true,
-            message: "Dashboard retrieved successfully",
-            data: {
-                period: `${month}/${year}`,
-                totalIncome: totalIncome,
-                totalExpenses: totalExpenses,
-                oneTimeExpenses: totalOneTimeExpenses,
-                recurringExpenses: totalRecurringExpenses,
-                balance: balance,
-                isPositive: balance >= 0,
-                isOverBudget: totalExpenses > totalIncome,
-                overBudgetAmount: totalExpenses > totalIncome ? totalExpenses - totalIncome : 0
-            }
-        });
-
-    } catch (error) {
-        console.error('Dashboard error:', error);
-        res.status(500).json({
-            success: false,
-            message: "Servor error",
-            error: error.message
-        });
-    }
-
-}
-
-export const getExpensesByCategory = async (req,res) => {
-    try {
-       const oneTimeExpensesByCategory = await prisma.expense.groupBy({
-            by: ['categoryId'],
+        const transactionCount = await prisma.expense.count({
             where: {
                 userId: userId,
                 type: 'one_time',
@@ -117,177 +90,254 @@ export const getExpensesByCategory = async (req,res) => {
                     gte: firstDay,
                     lte: lastDay
                 }
-            },
-            _sum: {
-                amount: true
             }
         });
-        
-        const recurringExpensesByCategory = await prisma.expense.groupBy({
+
+        const incomeCount = await prisma.income.count({
+            where: {
+                userId: userId,
+                date: {
+                    gte: firstDay,
+                    lte: lastDay
+                }
+            }
+        });
+
+        const topCategories = await prisma.expense.groupBy({
             by: ['categoryId'],
             where: {
                 userId: userId,
-                type: 'recurring',
-                startDate: {
+                date: {
+                    gte: firstDay,
                     lte: lastDay
-                },
-                OR: [
-                    { endDate: null },
-                    { endDate: { gte: firstDay } }
-                ]
+                }
             },
-            _sum: {
-                amount: true
-            }
-        });
-        
-        const categoryTotals = {};
-        
-        oneTimeExpensesByCategory.forEach(item => {
-            categoryTotals[item.categoryId] = (categoryTotals[item.categoryId] || 0) + (item._sum.amount || 0);
-        });
-        
-        recurringExpensesByCategory.forEach(item => {
-            categoryTotals[item.categoryId] = (categoryTotals[item.categoryId] || 0) + (item._sum.amount || 0);
+            _sum: { amount: true },
+            orderBy: { _sum: { amount: 'desc' } },
+            take: 3
         });
 
-        const categoryIds = Object.keys(categoryTotals);
-        const categories = await prisma.category.findMany({
+        const categoryDetails = await prisma.category.findMany({
             where: {
-                id: { in: categoryIds }
+                id: { in: topCategories.map(cat => cat.categoryId) }
             },
-            select: {
-                id: true,
-                name: true
-            }
+            select: { id: true, name: true }
         });
-        
-        const expensesByCategory = categories.map(category => ({
-            categoryId: category.id,
-            categoryName: category.name,
-            totalAmount: categoryTotals[category.id] || 0
-        }));
-        
-        const totalExpenses = Object.values(categoryTotals).reduce((sum, amount) => sum + amount, 0);
-        
-        const expensesWithPercentage = expensesByCategory.map(item => ({
-            ...item,
-            percentage: totalExpenses > 0 ? ((item.totalAmount / totalExpenses) * 100).toFixed(2) : 0
-        }));
-        
-        expensesWithPercentage.sort((a, b) => b.totalAmount - a.totalAmount);
-        
+
+        const topCategoriesWithNames = topCategories.map(cat => {
+            const categoryInfo = categoryDetails.find(detail => detail.id === cat.categoryId);
+            return {
+                categoryId: cat.categoryId,
+                categoryName: categoryInfo?.name || 'Unknown',
+                amount: cat._sum.amount || 0
+            };
+        });
+
         res.json({
             success: true,
-            message: "Expenses by category retrieved successfully",
+            message: "Monthly summary retrieved successfully",
             data: {
-                period: `${month}/${year}`,
-                totalExpenses: totalExpenses,
-                categories: expensesWithPercentage,
-                categoryCount: expensesWithPercentage.length
+                period: `${year}-${month.toString().padStart(2, '0')}`,
+                month: new Date(year, month - 1).toLocaleString('en-US', { month: 'long', year: 'numeric' }),
+                ...totals,
+                statistics: {
+                    transactionCount,
+                    incomeCount,
+                    averageTransaction: transactionCount > 0 ? (totals.totalExpenses / transactionCount) : 0,
+                    topCategories: topCategoriesWithNames
+                }
             }
         });
-        
+
     } catch (error) {
-        console.error('Expenses by category error:', error);
+        console.error('Monthly summary error:', error);
         res.status(500).json({
             success: false,
             message: "Server error",
             error: error.message
         });
     }
-}
-export const getMonthlyTrend = async (req, res) => {
+};
+
+export const getCustomSummary = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { start, end } = req.query;
+
+        if (!start || !end) {
+            return res.status(400).json({
+                success: false,
+                message: "Both start and end dates are required",
+                error: "MISSING_DATE_RANGE"
+            });
+        }
+
+        const startDate = new Date(start);
+        const endDate = new Date(end);
+        endDate.setHours(23, 59, 59, 999);
+
+        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid date format. Use YYYY-MM-DD",
+                error: "INVALID_DATE_FORMAT"
+            });
+        }
+
+        if (startDate > endDate) {
+            return res.status(400).json({
+                success: false,
+                message: "Start date must be before end date",
+                error: "INVALID_DATE_RANGE"
+            });
+        }
+
+        const totals = await calculateTotals(userId, startDate, endDate);
+
+        const daysDiff = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+
+        const dailyAverages = {
+            income: totals.totalIncome / daysDiff,
+            expenses: totals.totalExpenses / daysDiff,
+            balance: totals.balance / daysDiff
+        };
+
+        const expensesByCategory = await prisma.expense.groupBy({
+            by: ['categoryId'],
+            where: {
+                userId: userId,
+                date: {
+                    gte: startDate,
+                    lte: endDate
+                }
+            },
+            _sum: { amount: true }
+        });
+
+        const categoryDetails = await prisma.category.findMany({
+            where: {
+                id: { in: expensesByCategory.map(exp => exp.categoryId) }
+            },
+            select: { id: true, name: true }
+        });
+
+        const categorizedExpenses = expensesByCategory.map(exp => {
+            const categoryInfo = categoryDetails.find(detail => detail.id === exp.categoryId);
+            return {
+                categoryId: exp.categoryId,
+                categoryName: categoryInfo?.name || 'Unknown',
+                amount: exp._sum.amount || 0,
+                percentage: totals.totalExpenses > 0 ? ((exp._sum.amount / totals.totalExpenses) * 100).toFixed(2) : 0
+            };
+        });
+
+        categorizedExpenses.sort((a, b) => b.amount - a.amount);
+
+        res.json({
+            success: true,
+            message: "Custom period summary retrieved successfully",
+            data: {
+                period: {
+                    start: start,
+                    end: end,
+                    days: daysDiff
+                },
+                ...totals,
+                dailyAverages,
+                expensesByCategory: categorizedExpenses
+            }
+        });
+
+    } catch (error) {
+        console.error('Custom summary error:', error);
+        res.status(500).json({
+            success: false,
+            message: "Server error",
+            error: error.message
+        });
+    }
+};
+
+export const getBudgetAlerts = async (req, res) => {
     try {
         const userId = req.user.id;
         const currentDate = new Date();
-        const year = parseInt(req.query.year) || currentDate.getFullYear();
-        const monthsCount = parseInt(req.query.months) || 6;
-        const monthlyData = [];
-        
-        for (let i = monthsCount - 1; i >= 0; i--) {
-            const targetDate = new Date(year, currentDate.getMonth() - i, 1);
-            const targetYear = targetDate.getFullYear();
-            const targetMonth = targetDate.getMonth() + 1;
-            
-            const { firstDay, lastDay } = getMonthDate(targetYear, targetMonth);
-            
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth() + 1;
 
-            const incomeResult = await prisma.income.aggregate({
-                where: {
-                    userId: userId,
-                    date: {
-                        gte: firstDay,
-                        lte: lastDay
-                    }
-                },
-                _sum: {
-                    amount: true
-                }
-            });
+        const { firstDay, lastDay } = getDateRange(year, month);
+        const totals = await calculateTotals(userId, firstDay, lastDay);
 
-            const oneTimeExpenseResult = await prisma.expense.aggregate({
-                where: {
-                    userId: userId,
-                    type: 'one_time',
-                    date: {
-                        gte: firstDay,
-                        lte: lastDay
-                    }
-                },
-                _sum: {
-                    amount: true
-                }
-            });
+        const alerts = [];
 
-            const recurringExpenses = await prisma.expense.findMany({
-                where: {
-                    userId: userId,
-                    type: 'recurring',
-                    startDate: {
-                        lte: lastDay
-                    },
-                    OR: [
-                        { endDate: null },
-                        { endDate: { gte: firstDay } }
-                    ]
-                }
-            });
-            
-            const totalIncome = incomeResult._sum.amount || 0;
-            const totalOneTimeExpenses = oneTimeExpenseResult._sum.amount || 0;
-            const totalRecurringExpenses = recurringExpenses.reduce((sum, expense) => sum + expense.amount, 0);
-            const totalExpenses = totalOneTimeExpenses + totalRecurringExpenses;
-            const balance = totalIncome - totalExpenses;
-            
-            monthlyData.push({
-                year: targetYear,
-                month: targetMonth,
-                monthName: targetDate.toLocaleString('en-US', { month: 'long' }),
-                period: `${targetMonth}/${targetYear}`,
-                totalIncome,
-                totalExpenses,
-                balance,
-                isPositive: balance >= 0
+        if (totals.isOverBudget) {
+            alerts.push({
+                type: "budget_exceeded",
+                severity: "high",
+                title: "Budget Exceeded",
+                message: `You've exceeded your monthly budget by $${totals.overBudgetAmount.toFixed(2)}`,
+                amount: totals.overBudgetAmount
             });
         }
-        
+
+        const spendingRatio = totals.totalIncome > 0 ? (totals.totalExpenses / totals.totalIncome) : 0;
+        if (!totals.isOverBudget && spendingRatio > 0.8) {
+            alerts.push({
+                type: "high_spending",
+                severity: "medium",
+                title: "High Spending Alert",
+                message: `You've spent ${(spendingRatio * 100).toFixed(1)}% of your monthly income`,
+                percentage: (spendingRatio * 100).toFixed(1)
+            });
+        }
+
+
+        if (totals.totalIncome === 0 && totals.totalExpenses > 0) {
+            alerts.push({
+                type: "no_income",
+                severity: "high",
+                title: "No Income Recorded",
+                message: "You have expenses but no income recorded for this month"
+            });
+        }
+
+        const recurringRatio = totals.totalExpenses > 0 ? (totals.recurringExpenses / totals.totalExpenses) : 0;
+        if (recurringRatio > 0.7) {
+            alerts.push({
+                type: "high_recurring",
+                severity: "low",
+                title: "High Recurring Expenses",
+                message: `${(recurringRatio * 100).toFixed(1)}% of your expenses are recurring`,
+                percentage: (recurringRatio * 100).toFixed(1)
+            });
+        }
+
+        const hasMainAlert = totals.isOverBudget;
+        const mainAlertMessage = hasMainAlert 
+            ? `You've exceeded your monthly budget by $${totals.overBudgetAmount.toFixed(2)}`
+            : null;
+
         res.json({
             success: true,
-            message: "Monthly trend retrieved successfully",
+            message: "Budget alerts retrieved successfully",
             data: {
-                months: monthlyData,
-                period: `${monthsCount} months trend`,
+                alert: hasMainAlert,
+                message: mainAlertMessage,
+                period: `${year}-${month.toString().padStart(2, '0')}`,
                 summary: {
-                    avgIncome: monthlyData.reduce((sum, month) => sum + month.totalIncome, 0) / monthlyData.length,
-                    avgExpenses: monthlyData.reduce((sum, month) => sum + month.totalExpenses, 0) / monthlyData.length,
-                    avgBalance: monthlyData.reduce((sum, month) => sum + month.balance, 0) / monthlyData.length
-                }
+                    totalIncome: totals.totalIncome,
+                    totalExpenses: totals.totalExpenses,
+                    balance: totals.balance,
+                    overBudgetAmount: totals.overBudgetAmount,
+                    spendingRatio: (spendingRatio * 100).toFixed(1)
+                },
+                alerts: alerts,
+                alertCount: alerts.length
             }
         });
-        
+
     } catch (error) {
-        console.error('Monthly trend error:', error);
+        console.error('Budget alerts error:', error);
         res.status(500).json({
             success: false,
             message: "Server error",
