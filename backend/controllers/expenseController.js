@@ -43,17 +43,41 @@ export const createExpense = async (req,res) => {
     }
 };
 export const getExpense = async (req,res) => {
-    try {
-        const { start,end,category,type} = req.query;
+     try {
+    const { start, end, category, type } = req.query;
+    const userId = req.user?.id;
 
-        const userId = req.user.id;
-        const where = { userId };
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
 
-        if( start || end){
-            where.date= {};
-            if (start) where.date.gte = new Date(start);
-            if (end) where.date.lte = new Date(end)
-        }
+    const where = { userId };
+
+    if (start || end) {
+      where.date = {};
+      if (start) where.date.gte = new Date(start);
+      if (end) where.date.lte = new Date(end);
+    }
+
+    if (category) {
+      where.categoryId = category;
+    }
+
+    if (type && ['recurring', 'one_time'].includes(type)) {
+      where.type = type;
+    }
+
+    const expenses = await prisma.expense.findMany({
+      where,
+      include: {
+        category: true
+      },
+      orderBy: {
+        date: 'desc'
+      }
+    });
+
+    res.status(200).json(expenses);
     } catch (error) {
         res.status(500).json({message: "server error",error: error.message})   
     }
