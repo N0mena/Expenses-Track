@@ -8,9 +8,10 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+
 import { format, subMonths, startOfMonth, endOfMonth } from "date-fns";
 import { useState, useEffect } from "react";
-import { mockApi } from "../../services/mockApi";
+import { mockApi } from "../../services/mockApi.js";
 
 ChartJS.register(
   CategoryScale,
