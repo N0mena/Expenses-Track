@@ -26,7 +26,6 @@ export const authenticateToken = async (req, res, next) => {
         firstName: true,
         lastName: true,
         birthDate: true,
-        createdAt: true
       }
     });
 

@@ -1,18 +1,21 @@
 import express from "express"
 import { createDefaultCategories,createCategory,deleteCategoryId,updateCategoryId,getAllCategories,getCategoryById } from "../controllers/categoryController.js"
+import { authenticateToken } from "../middleware/auth.js";
 
-const router =  express.Router();
+const categoryRoutes =  express.Router();
 
-router.post("/",createCategory)
+categoryRoutes.use(authenticateToken)
 
-router.post("/",createDefaultCategories)
+categoryRoutes.use(authenticateToken);
 
-router.get("/",getAllCategories)
+categoryRoutes.post("/",createCategory)
 
-router.get("/",getCategoryById)
+categoryRoutes.get("/",getAllCategories)
 
-router.put("/",updateCategoryId)
+categoryRoutes.get("/:id",getCategoryById)
 
-router.delete("/",deleteCategoryId)
+categoryRoutes.put("/:id",updateCategoryId)
+
+categoryRoutes.delete("/:id",deleteCategoryId)
 
 export default categoryRoutes;
