@@ -321,7 +321,7 @@ const Expenses = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      ${expense.amount.toFixed(2)}
+                      Ar {expense.amount.toFixed(2)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {formatExpenseDate(expense)}

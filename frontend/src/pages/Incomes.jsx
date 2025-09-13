@@ -112,7 +112,7 @@ const Incomes = () => {
           <p className="text-sm text-gray-600 mt-1">
             Total:{" "}
             <span className="font-semibold text-green-600">
-              ${getTotalIncome().toFixed(2)}
+              Ar {getTotalIncome().toFixed(2)}
             </span>
           </p>
         </div>
@@ -253,7 +253,7 @@ const Incomes = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
-                      +${income.amount.toFixed(2)}
+                      +Ar {income.amount.toFixed(2)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {format(new Date(income.date), "MMM dd, yyyy")}
