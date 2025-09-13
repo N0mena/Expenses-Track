@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
-import { Eye, EyeOff, DollarSign } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import { Eye, EyeOff, DollarSign } from "lucide-react";
 
 const Login = () => {
   const [formData, setFormData] = useState({
-    email: 'demo@expencio.com',
-    password: 'password123'
+    email: "demo@gmail.com",
+    password: "password123",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -15,7 +15,7 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const from = location.state?.from?.pathname || '/dashboard';
+  const from = location.state?.from?.pathname || "/dashboard";
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -29,9 +29,9 @@ const Login = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -40,11 +40,11 @@ const Login = () => {
     setIsSubmitting(true);
 
     const result = await login(formData.email, formData.password);
-    
+
     if (result.success) {
       navigate(from, { replace: true });
     }
-    
+
     setIsSubmitting(false);
   };
 
@@ -54,17 +54,18 @@ const Login = () => {
         <div className="text-center">
           <div className="flex justify-center mb-8">
             <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-[#031163] rounded-3xl flex items-center justify-center">
+              <div className="w-12 h-12 bg-[#031163] rounded-2xl flex items-center justify-center">
                 <DollarSign className="h-6 w-6 text-white" />
               </div>
-              <h1 className="text-4xl font-light text-slate-900">Expencio</h1>
+              <h1 className="text-4xl font-light text-slate-900">Hello Money</h1>
+             
             </div>
           </div>
-          <h2 className="text-5xl font-light text-[#1fbfb8] mb-2">
-            Welcome Back
+          <h2 className="mt-4 text-center text-5xl font-light text-[#1fbfb8]">
+            Welcome back
           </h2>
-          <p className="text-slate-600">
-            Create an account?{' '}
+          <p className="mt-4 text-center text-m text-slate-600">
+            Don't have an account?{" "}
             <Link
               to="/signup"
               className="font-medium text-[#1978a5] hover:text-slate-700 transition-colors"
@@ -73,7 +74,7 @@ const Login = () => {
             </Link>
           </p>
         </div>
-        
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="bg-white/70 backdrop-blur-sm border border-slate-200/60 rounded-3xl p-8 shadow-sm space-y-6">
             {error && (
@@ -90,7 +91,10 @@ const Login = () => {
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="email" className="block text-sm font-medium text-[#05716c]">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-[#05716c]"
+              >
                 Email address
               </label>
               <input
@@ -107,14 +111,17 @@ const Login = () => {
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="password" className="block text-sm font-medium text-[#05716c]">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-[#05716c]"
+              >
                 Password
               </label>
               <div className="relative">
                 <input
                   id="password"
                   name="password"
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   required
                   className="w-full px-4 py-3 pr-12 border border-slate-200 rounded-2xl bg-white/50 backdrop-blur-sm placeholder-slate-400 text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/20 focus:border-slate-300 transition-all"
@@ -140,7 +147,7 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full flex justify-center py-3 px-4 text-sm font-medium rounded-2xl text-white bg-[#1fbfb8] hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md"
+                className="w-full flex justify-center py-3 px-4 text-sm font-medium rounded-2xl text-white bg-[#1fbfb8] hover:bg-[#031163] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md"
               >
                 {isSubmitting ? (
                   <div className="flex items-center">
@@ -148,7 +155,7 @@ const Login = () => {
                     Signing in...
                   </div>
                 ) : (
-                  'Sign in'
+                  "Sign in"
                 )}
               </button>
             </div>
@@ -160,4 +167,3 @@ const Login = () => {
 };
 
 export default Login;
-
