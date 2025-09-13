@@ -159,7 +159,7 @@ const Dashboard = () => {
                 Total Income
               </p>
               <p className="text-2xl font-light text-slate-900">
-                ${summary?.totalIncome?.toFixed(2) || "0.00"}
+                Ar {summary?.totalIncome?.toFixed(2) || "0.00"}
               </p>
             </div>
             <div className="w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center">
@@ -175,7 +175,7 @@ const Dashboard = () => {
                 Total Expenses
               </p>
               <p className="text-2xl font-light text-slate-900">
-                ${summary?.totalExpenses?.toFixed(2) || "0.00"}
+                Ar {summary?.totalExpenses?.toFixed(2) || "0.00"}
               </p>
             </div>
             <div className="w-12 h-12 bg-rose-100 rounded-2xl flex items-center justify-center">
@@ -195,7 +195,7 @@ const Dashboard = () => {
                     : "text-rose-600"
                 }`}
               >
-                ${summary?.balance?.toFixed(2) || "0.00"}
+                Ar {summary?.balance?.toFixed(2) || "0.00"}
               </p>
             </div>
             <div
@@ -266,7 +266,7 @@ const Dashboard = () => {
                     </p>
                   </div>
                   <span className="text-sm font-semibold text-rose-600">
-                    -${expense.amount.toFixed(2)}
+                    -Ar {expense.amount.toFixed(2)}
                   </span>
                 </div>
               );
@@ -306,7 +306,7 @@ const Dashboard = () => {
                   </p>
                 </div>
                 <span className="text-sm font-semibold text-emerald-600">
-                  +${income.amount.toFixed(2)}
+                  +Ar {income.amount.toFixed(2)}
                 </span>
               </div>
             ))}
