@@ -113,7 +113,7 @@ const Dashboard = () => {
         <div className="flex space-x-3">
           <Link
             to="/expenses/new"
-            className="inline-flex items-center px-5 py-2.5 text-sm font-medium rounded-2xl text-white bg-slate-900 hover:bg-slate-800 transition-all duration-200 shadow-sm hover:shadow-md"
+            className="inline-flex items-center px-5 py-2.5 text-sm font-medium rounded-2xl text-white bg-emerald-800 hover:bg-[#1fbfb8] transition-all duration-200 shadow-sm hover:shadow-md"
           >
             <Plus className="h-4 w-4 mr-2" />
             Add Expense

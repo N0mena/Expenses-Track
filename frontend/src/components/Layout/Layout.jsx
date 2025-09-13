@@ -44,7 +44,7 @@ export const Layout = ({ children }) => {
       {sidebarOpen && (
         <div className="fixed inset-0 z-40 lg:hidden">
           <div
-            className="fixed inset-0 bg-slate-900/20 backdrop-blur-sm"
+            className="fixed inset-0 bg-[#1fbfb8]/20 backdrop-blur-sm"
             onClick={() => setSidebarOpen(false)}
           />
         </div>
@@ -56,7 +56,7 @@ export const Layout = ({ children }) => {
       >
         <div className="flex items-center justify-between h-16 px-6 border-b border-slate-200/60">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-[#031163] rounded-3xl flex items-center justify-center">
+            <div className="w-10 h-10 bg-[#1fbfb8] rounded-3xl flex items-center justify-center">
               <DollarSign className="h-6 w-6 text-white" />
             </div>
             <span className="text-xl font-light text-slate-900">Hello Money</span>
@@ -79,7 +79,7 @@ export const Layout = ({ children }) => {
                   to={item.href}
                   className={`group flex items-center px-4 py-3 text-sm font-medium rounded-2xl transition-all duration-200 ${
                     isActive(item.href)
-                      ? "bg-slate-900 text-white shadow-sm"
+                      ? "bg-[#1fbfb8] text-white shadow-sm"
                       : "text-slate-600 hover:bg-slate-100/70 hover:text-slate-900"
                   }`}
                   onClick={() => setSidebarOpen(false)}
