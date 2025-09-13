@@ -6,7 +6,7 @@ CREATE TABLE "users" (
     "username" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "birth_date" DATETIME NOT NULL
+    "birth_date" DATETIME
 );
 
 -- CreateTable
@@ -17,7 +17,7 @@ CREATE TABLE "expenses" (
     "category_id" TEXT NOT NULL,
     "description" TEXT,
     "type" TEXT NOT NULL,
-    "start_date" DATETIME NOT NULL,
+    "start_date" DATETIME,
     "end_date" DATETIME,
     "receipt" TEXT,
     "user_id" INTEGER NOT NULL,
@@ -44,9 +44,12 @@ CREATE TABLE "incomes" (
     "description" TEXT,
     "user_id" INTEGER NOT NULL,
     "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "update_at" DATETIME NOT NULL,
+    "updated_at" DATETIME NOT NULL,
     CONSTRAINT "incomes_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "users_username_key" ON "users"("username");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
