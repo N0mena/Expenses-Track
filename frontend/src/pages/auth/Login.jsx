@@ -54,7 +54,7 @@ const Login = () => {
         <div className="text-center">
           <div className="flex justify-center mb-8">
             <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-[#031163] rounded-2xl flex items-center justify-center">
+              <div className="w-12 h-12 bg-[#031163] rounded-3xl flex items-center justify-center">
                 <DollarSign className="h-6 w-6 text-white" />
               </div>
               <h1 className="text-4xl font-light text-slate-900">Hello Money</h1>
