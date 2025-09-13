@@ -2,7 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 
-// Import des routes
 import expenseRoutes from './routes/expenseRoutes.js';
 import incomeRoutes from './routes/incomeRoutes.js';
 import authRoutes from './routes/authRoutes.js';
@@ -14,7 +13,7 @@ dotenv.config();
 const app = express();
 const PORT = 3000;
 
-// ✅ CORS config VITE-compatible
+
 const allowedOrigins = [
   'http://localhost:5173'
 ];
@@ -26,10 +25,9 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// Middlewares globaux
+
 app.use(express.json());
 
-// ✅ Route de test
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'OK',
@@ -40,21 +38,18 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// ✅ Routes principales
 app.use('/api/auth', authRoutes);
 app.use('/expenses', expenseRoutes);
 app.use('/incomes', incomeRoutes);
 app.use('/categories', categoryRoutes);
 app.use('/dashboard', dashboardRoutes);
 
-// 404 - Route inconnue
 app.use((req, res, next) => {
   const error = new Error(`Route ${req.originalUrl} not found`);
   error.status = 404;
   next(error);
 });
 
-// Gestion globale des erreurs
 app.use((err, req, res) => {
   console.error('Erreur globale :', err);
 
@@ -68,9 +63,8 @@ app.use((err, req, res) => {
   });
 });
 
-// ✅ Démarrage du serveur
 app.listen(PORT, () => {
-  console.log('🚀 Backend lancé !');
-  console.log(`👉 http://localhost:${PORT}`);
-  console.log(`🔗 Frontend autorisé : ${allowedOrigins[0]}`);
+  console.log(' Backend lancé !');
+  console.log(` http://localhost:${PORT}`);
+  console.log(` Frontend autorisé : ${allowedOrigins[0]}`);
 });
