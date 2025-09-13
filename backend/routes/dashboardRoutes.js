@@ -1,17 +1,15 @@
 import { Router } from "express";
-import { getDashboard, getExpensesByCategory, getMonthlyTrend } from "../controllers/dashboardController.js";
+import { getMonthlySummary, getCustomSummary, getBudgetAlerts } from "../controllers/dashboardController.js";
 import { authenticateToken } from "../middleware/auth.js";
 
-const dashboardRoutes = Router();
+const summaryRoutes = Router();
 
+summaryRoutes.use(authenticateToken);
 
-dashboardRoutes.use(authenticateToken);
+summaryRoutes.get("/monthly", getMonthlySummary);
 
+summaryRoutes.get("/alerts", getBudgetAlerts);
 
-dashboardRoutes.get("/", getDashboard);
+summaryRoutes.get("/", getCustomSummary);
 
-dashboardRoutes.get("/categories", getExpensesByCategory);
-
-dashboardRoutes.get("/trend", getMonthlyTrend);
-
-export default dashboardRoutes;
+export default summaryRoutes;

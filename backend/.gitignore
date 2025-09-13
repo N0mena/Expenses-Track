@@ -5,4 +5,4 @@ node_modules
 /generated/prisma
 **/generated/prisma
 dev.deb
-*dev.deb
+.deb
