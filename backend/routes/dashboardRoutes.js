@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getMonthlySummary, getCustomSummary, getBudgetAlerts } from "../controllers/dashboardController.js";
+import { getMonthlySummary, getCustomSummary, getBudgetAlerts } from "../controllers/dashboardController.js ";
 import { authenticateToken } from "../middleware/auth.js";
 
 const summaryRoutes = Router();
