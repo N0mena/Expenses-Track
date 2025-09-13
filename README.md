@@ -27,7 +27,7 @@ Git
 Installation
 
 Clone the Repository:
-git clone https://github.com/your-username/hello-money.git
+[git clone https://github.com/N0mena/hello-money.git]
 cd hello-money
 
 
