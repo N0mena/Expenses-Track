@@ -338,8 +338,7 @@ export const getBudgetAlerts = async (req, res) => {
 
     } catch (error) {
         console.error('Budget alerts error:', error);
-        res.status(500).json({chr
-            success: false,
+        res.status(500).json({
             message: "Server error",
             error: error.message
         });
